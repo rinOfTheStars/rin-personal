@@ -1,3 +1,3 @@
 app: vscode
 -
-git message accept: key(cmd-shift-f1)
+git message (accept | except): key(cmd-shift-f1)
