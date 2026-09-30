@@ -1,6 +1,6 @@
 import os
 
-from talon import Context, actions, ui
+from talon import Context, actions
 
 ctx = Context()
 ctx.matches = r"""

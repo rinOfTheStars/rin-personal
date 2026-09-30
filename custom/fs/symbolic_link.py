@@ -1,8 +1,7 @@
 import os
 import subprocess
-from typing import Optional
 
-from talon import Context, Module, actions, app
+from talon import Context, Module, actions, app, clip
 
 ctx = Context()
 mod = Module()
@@ -12,21 +11,13 @@ os: mac
 app: finder
 """
 
-def write_to_clipboard(output : any):
-        process = subprocess.Popen(
-            "/usr/bin/pbcopy", stdin=subprocess.PIPE)
-        process.communicate(output)
-
-def read_from_clipboard():
-        return subprocess.check_output("/usr/bin/pbpaste")
-
 @mod.action_class
 class Actions:
 
     def symlink_active_to_clipboard(direction: bool, name: str):
         """Symlinks active directory to or from the directory or file in the clipboard"""
         here = actions.user.file_manager_current_path()
-        possibly_there = read_from_clipboard()
+        possibly_there = clip.get()
         if os.path.exists(possibly_there):
             result = None
             actual_name = None
@@ -40,7 +31,7 @@ class Actions:
                 result = actions.user.symlink(here, possibly_there, direction, name)
             
             if result is not None:
-                if reason != 0:
+                if result.returncode != 0:
                     app.notify(
                         "Symlink failure",
                         f"symlink command w/ args {result.args} exited with code {result.returncode}, check talon logs for details"
