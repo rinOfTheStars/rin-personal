@@ -34,4 +34,5 @@ class Actions:
             clip.set(to_paste)
             actions.sleep("50ms")
             actions.key("cmd-v") # We don't press enter for the user in case they made a mistake
+            actions.sleep("50ms")
             clip.set(clean) # Will probs make this a configurable feature in the future?
