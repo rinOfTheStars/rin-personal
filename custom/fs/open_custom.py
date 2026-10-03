@@ -27,24 +27,25 @@ class Actions:
                 )
                 return
             program = application.path
+            # print("program: " + program)
         return subprocess.run(["/usr/bin/open", "-a", program, path], capture_output=True)
         
-    def finder_open_in(path: str, app_or_path: str = None):
-        """Opens the supplied path within a given running program. macOS only, depends on talon_axkit"""
-        old_clipboard = clip.get()
-        actions.key("alt-cmd-c")
-        temp_keyboard = clip.get()
-        result = actions.user.finder_open_in_inner(temp_keyboard, app_or_path)
+    def finder_open_in(local_path: str, app_or_path: str = None):
+        """Opens the supplied local_path within a given running program. macOS only, depends on talon_axkit"""
+        current_path = actions.user.file_manager_current_path()
+        target_path = os.path.join(current_path, local_path)
+        target_path = os.path.abspath(target_path)
+        # print("target_path: " + target_path)
+        result = actions.user.finder_open_in_inner(target_path, app_or_path)
         if result is not None:
                 if result.returncode != 0:
                     app.notify(
                         "Open in app failure",
                         f"open command w/ args {result.args} exited with code {result.returncode}, check talon logs for details"
                     )
-                    print(result.stdout)
+                    print("Stdout code is " + str(result.returncode))
         else:
             app.notify(
                 "WTF??",
                 f"open command returned None??? Report this!!!"
             )
-        clip.set(old_clipboard)

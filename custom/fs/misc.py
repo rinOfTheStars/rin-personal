@@ -2,7 +2,7 @@ import os
 import subprocess
 from typing import Optional
 
-from talon import Context, Module, actions, app
+from talon import Context, Module, actions, app, clip
 
 ctx = Context()
 mod = Module()
@@ -20,8 +20,4 @@ class Actions:
         Effectively the same as `\"copy path\"` w.o any file highlighted 
         """
         here = actions.user.file_manager_current_path()
-        process = subprocess.Popen(
-            "/usr/bin/pbcopy", stdin=subprocess.PIPE, text=True)
-        process.communicate(here)
-        code = process.returncode
-        print(code)
+        clip.set_text(here)
