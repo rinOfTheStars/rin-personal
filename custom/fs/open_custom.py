@@ -15,7 +15,7 @@ tag: user.custom-fs
 class Actions:
         
     def finder_open_in(local_path: str, app_target: str = None):
-        """Opens the supplied local_path within a given running program. macOS only, depends on talon_axkit"""
+        """Opens the supplied local_path within a given running program. macOS only."""
         current_path = actions.user.file_manager_current_path()
         target_path = os.path.join(current_path, local_path)
         target_path = os.path.abspath(target_path)
