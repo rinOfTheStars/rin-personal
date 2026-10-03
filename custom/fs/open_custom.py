@@ -13,30 +13,28 @@ tag: user.custom-fs
 
 @mod.action_class
 class Actions:
-
-    def finder_open_in_inner(path: str, app_or_path: str = None) -> subprocess.CompletedProcess | None :
-        """INTERNAL"""
-        if app_or_path.endswith(".app") and os.path.exists(app_or_path):
-            program = app_or_path
-        else:
-            application = actions.user.get_running_app(app_or_path)
-            if not application:
-                app.notify(
-                    "Couldn't find application",
-                    f"Couldn't find a running app named {application}",
-                )
-                return
-            program = application.path
-            # print("program: " + program)
-        return subprocess.run(["/usr/bin/open", "-a", program, path], capture_output=True)
         
-    def finder_open_in(local_path: str, app_or_path: str = None):
+    def finder_open_in(local_path: str, app_target: str = None):
         """Opens the supplied local_path within a given running program. macOS only, depends on talon_axkit"""
         current_path = actions.user.file_manager_current_path()
         target_path = os.path.join(current_path, local_path)
         target_path = os.path.abspath(target_path)
         # print("target_path: " + target_path)
-        result = actions.user.finder_open_in_inner(target_path, app_or_path)
+        if app_target.endswith(".app") and os.path.exists(app_target):
+            app_path = app_target
+        else:
+            application = actions.user.get_running_app(app_target)
+            if not application:
+                app.notify(
+                    "Couldn't find application",
+                    f"Couldn't find a running app named {application}",
+                )
+                app_path = None
+            app_path = application.path
+        if app_path is not None:
+            result = subprocess.run(["/usr/bin/open", "-a",app_path , target_path], capture_output=True)
+        else:
+            result = None
         if result is not None:
                 if result.returncode != 0:
                     app.notify(
@@ -45,7 +43,9 @@ class Actions:
                     )
                     print("Stdout code is " + str(result.returncode))
         else:
-            app.notify(
-                "WTF??",
-                f"open command returned None??? Report this!!!"
-            )
+            if app_path is not None:
+                app.notify(
+                    "Unexpected behavior",
+                    "app_target is valid while open command returned None; this should never happen?"
+                )
+                print("app_target is valid while open command returned None; this should never happen?")
